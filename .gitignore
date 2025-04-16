@@ -1,0 +1,9 @@
+*.csv
+*.exe
+*.txt
+*.tsv
+matmult.cpp
+*.ipynb
+/.vscode
+testing.cpp
+!input_data.csv

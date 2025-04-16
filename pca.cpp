@@ -157,13 +157,20 @@ int main(int argc, char* argv[]){
     for(int i = 0;i<eigenvalues.size();i++){
         scaledeigenvalues.push_back(fabs(eigenvalues[i])/eigensum);
     }
-    std::vector<std::vector<double>> projdata = colmatmult(covMat,eigenvectors);
+
+    std::string outputfile;
+    if(argc == 3){
+        outputfile = argv[2];
+    }
+    else{
+        outputfile = "pca";
+    }
 
     std::ofstream myfile;
     //file output: line of eigenvalues, line of % variance captured, line of cumulative % captured
     //eigenvectors as row vectors
     //samples as row vectors with principal components as basis in the same order as above
-    myfile.open("pca_results.csv");
+    myfile.open(outputfile + "_results.csv");
 
     myfile << eigenvalues[0];
     for(int i = 1; i < eigenvalues.size();i++){
@@ -192,17 +199,25 @@ int main(int argc, char* argv[]){
         }
         myfile << std::endl;
     }
+    myfile.close();
 
-    for(int i = 0; i < projdata.size();i++){
-        myfile << projdata[0][i];
-        for(int j =1; j < projdata[i].size();j++){
-            myfile << ", " << projdata[j][i];
+    std::ofstream myfile2;
+    myfile2.open(outputfile + "_new_vectors.csv");
+    for(int i = 0; i < meanMat[0].size();i++){
+        std::vector<double> sample;
+        for(int j = 0; j < meanMat.size();j++){
+            sample.push_back(meanMat[j][i]);
         }
-        if(i != projdata.size()-1){
-            myfile << std::endl;
+        std::vector<double> projection;
+        for(int j = 0; j < eigenvectors.size()-1;j++){
+            myfile2 << dotprod(sample,eigenvectors[j]) << ',';
+        }
+        myfile2 << dotprod(sample,eigenvectors[eigenvectors.size()-1]);
+        if(i != meanMat[0].size()-1){
+            myfile2 << std::endl;
         }
     }
-    myfile.close();
+    myfile2.close();
 
     return 0;
 }
